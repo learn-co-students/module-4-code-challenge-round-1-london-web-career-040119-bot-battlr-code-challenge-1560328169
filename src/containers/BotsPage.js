@@ -10,13 +10,19 @@ class BotsPage extends React.Component {
   state = {
     bots: [],
     enlistedBots: [],
-    selectedBot: null
+    selectedBot: null,
+    filteredBots: []
   }
 
   componentDidMount = () => {
     fetch(botsURL)
     .then(resp => resp.json())
-    .then(bots => this.setState({ bots }))
+    .then(bots => this.setState({ bots, filteredBots: bots }))
+  }
+
+  filterBots = (event) => {
+    event.preventDefault()
+    this.setState({ filteredBots: [...this.state.bots].filter(bot => bot.name.toLowerCase().includes(event.target.search.value.toLowerCase())) })
   }
 
   viewBotSpecs = bot => {
@@ -45,8 +51,16 @@ class BotsPage extends React.Component {
           < YourBotArmy yourBots={this.state.enlistedBots} release={this.releaseBot}/>
           {
             this.state.selectedBot
-              ? < BotSpecs bot={this.state.selectedBot} back={this.backToCollection} enlist={this.enlistBot}/>
-              : < BotCollection bots={this.state.bots} view={this.viewBotSpecs}/>
+              ? < BotSpecs 
+                    bot={this.state.selectedBot} 
+                    back={this.backToCollection} 
+                    enlist={this.enlistBot}
+                />
+              : < BotCollection 
+                    bots={this.state.filteredBots} 
+                    view={this.viewBotSpecs}
+                    filter={this.filterBots}
+                />
           }
       </div>
     );
